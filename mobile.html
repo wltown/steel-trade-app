@@ -233,7 +233,7 @@ function meTab(m){
   '<div class="ss" style="margin-bottom:10px"><h4 style="font-size:13px;font-weight:700;margin-bottom:8px">🔄 数据同步</h4>'+
   '<div style="font-size:12px;line-height:2"><div>状态：'+(s.hasToken?(s.inSync?'<span style="color:var(--g)">✅ 已同步</span>':'<span style="color:var(--w)">🟡 有未同步数据</span>'):'<span style="color:var(--r)">⚠️ 未配置</span>')+'</div>'+
   '<div>上次拉取：'+(s.lastPull?new Date(s.lastPull).toLocaleString('zh-CN'):'从未')+'</div></div>'+
-  '<div class="fg" style="margin-top:8px"><label>GitHub Token</label><input type="password" id="ms_token" value="'+tk+'" placeholder="ghp_xxxx" style="font-size:14px"></div>'+
+  '<div class="fg" style="margin-top:8px"><label>GitHub Token（粘贴后保存即可双向同步）</label><input type="password" id="ms_token" value="'+tk+'" placeholder="ghp_xxxx" style="font-size:14px"></div>'+
   '<div style="display:flex;gap:6px;margin-top:8px"><button class="btn bp bs" style="flex:1" onclick="saveMobileToken()">💾 保存Token</button><button class="btn bo bs" style="flex:1" onclick="doManualSync()">🔄 立即同步</button></div>'+
   '<span style="font-size:10px;color:var(--t2)">Token仅存本地，只用于同步数据</span></div>'+
   '<div class="card"><div class="ch">⚙️ 设置</div><div class="cb" style="font-size:13px;line-height:2.2">'+
@@ -287,18 +287,28 @@ document.addEventListener('touchend',async()=>{if(pullActive){document.getElemen
 
 // ==================== INIT ====================
 async function init(){
-  // 迁移 token
-  const tk2=localStorage.getItem('steel_v5_sync_token_v2');
-  if(tk2&&typeof Sync!=='undefined'&&!Sync.hasToken()){Sync.setToken(tk2)}
-  // 初始化同步
-  if(typeof Sync!=='undefined'){await Sync.init();setInterval(()=>updateSyncIndicator(),30000)}
+  // 启动后自动从云端拉取数据（读取不需要Token）
+  if(typeof Sync!=='undefined'){
+    const r=await Sync.pull();
+    if(r.updated){
+      render();
+      st('✅ 已同步云端数据 (' + r.count + ' 条)');
+    }
+    if(Sync.hasToken()){
+      const pr=await Sync.push();
+      if(pr.ok) st('✅ 双向同步完成');
+    } else if(!localStorage.getItem('steel_tip_shown')) {
+      setTimeout(() => {
+        st('💡 点底部「⚙️ 我的」粘贴Token开启双向同步');
+        localStorage.setItem('steel_tip_shown', '1');
+      }, 1500);
+    }
+    setInterval(()=>updateSyncIndicator(),30000);
+  }
   updateSyncIndicator();
   render();
-  // PWA: Service Worker
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js',{scope:'/steel-trade-app/'}).catch(()=>{})}
-  // PWA: 检查是否已安装
-  if(window.matchMedia('(display-mode: standalone)').matches){localStorage.setItem('pwa_installed','1');document.getElementById('installCard')&&(document.getElementById('installCard').style.display='none')}
-  // 更新安装按钮状态
+  if(window.matchMedia('(display-mode: standalone)').matches){localStorage.setItem('pwa_installed','1');var ic=document.getElementById('installCard');if(ic)ic.style.display='none'}
   setTimeout(updateInstallBtn,2000);
 }
 

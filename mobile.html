@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f172a">
+<title>废钢管理 · 手机版</title>
+<style>
+:root{--p:#2563eb;--pd:#1d4ed8;--r:#dc2626;--g:#16a34a;--w:#ea580c;--bg:#f1f5f9;--c:#fff;--t:#0f172a;--t2:#64748b;--b:#e2e8f0;--rd:12px;--sh:0 1px 3px rgba(0,0,0,.06);--btm:env(safe-area-inset-bottom,0px)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t);line-height:1.5;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;padding-bottom:calc(60px + var(--btm))}
+.hdr{background:linear-gradient(135deg,#0f172a,#1e3a5f);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center}
+.hdr h1{font-size:16px;font-weight:700}.hdr .st{display:flex;align-items:center;gap:6px;font-size:11px;opacity:.8}
+.sync-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}.sync-dot.ok{background:#4ade80;box-shadow:0 0 6px #4ade80}.sync-dot.pending{background:#fbbf24;animation:pulse 1.5s infinite}.sync-dot.err{background:#f87171}@keyframes pulse{50%{opacity:.4}}
+.main{padding:12px;max-width:600px;margin:0 auto}
+.card{background:var(--c);border-radius:var(--rd);box-shadow:var(--sh);margin-bottom:10px;overflow:hidden}
+.ch{padding:12px 14px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700}
+.cb{padding:12px 14px}
+.dg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+.dg3{grid-template-columns:repeat(3,1fr)}
+.dc{background:var(--c);border-radius:var(--rd);box-shadow:var(--sh);padding:12px 8px;text-align:center}
+.dc .num{font-size:20px;font-weight:700;color:var(--p)}.dc .num.d{color:var(--r)}.dc .num.s{color:var(--g)}.dc .num.w{color:var(--w)}
+.dc .lbl{font-size:11px;color:var(--t2);margin-top:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:8px 16px;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600;min-height:40px}
+.bp{background:var(--p);color:#fff}.bd{background:var(--r);color:#fff}.bo{background:var(--c);border:1px solid var(--b);color:var(--t)}
+.bs{padding:6px 12px;font-size:12px;min-height:34px}
+.bad{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600}
+.bad-ur{background:#fef2f2;color:#dc2626}.bad-pr{background:#fffbeb;color:#ea580c}.bad-ru{background:#eff6ff;color:#2563eb}.bad-ok{background:#f0fdf4;color:#16a34a}
+.ol{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .1s}
+.ol:active{background:#f8fafc}.ol:last-child{border-bottom:none}
+.ol-l{flex:1;min-width:0}.ol-r{text-align:right;flex-shrink:0}
+.ol .t{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ol .s{font-size:11px;color:var(--t2);margin-top:1px}
+.ol .a{font-size:14px;font-weight:700}
+.fab{position:fixed;bottom:calc(76px + var(--btm));right:16px;width:52px;height:52px;border-radius:50%;background:var(--p);color:#fff;border:none;font-size:24px;box-shadow:0 4px 16px rgba(37,99,235,.4);cursor:pointer;z-index:50;display:flex;align-items:center;justify-content:center}
+.sheet{display:none;position:fixed;inset:0;z-index:200}.sheet.show{display:block}
+.sheet-bg{position:absolute;inset:0;background:rgba(15,23,42,.4)}
+.sheet-body{position:absolute;bottom:0;left:0;right:0;background:var(--c);border-radius:16px 16px 0 0;max-height:85vh;overflow-y:auto;padding:16px;animation:su .2s ease}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.sh h3{font-size:15px}.sc{border:none;background:none;font-size:20px;padding:4px 8px;cursor:pointer;color:var(--t2)}
+.fg{margin-bottom:10px}.fg label{display:block;font-size:12px;font-weight:600;margin-bottom:3px;color:var(--t2)}
+.fg input,.fg select,.fg textarea{width:100%;padding:10px 12px;border:1px solid var(--b);border-radius:8px;font-size:16px;font-family:inherit;background:#fafbfc;-webkit-appearance:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--p);background:#fff}
+.fg textarea{resize:vertical;min-height:60px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 20px;border-radius:20px;font-size:12px;z-index:300;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}
+.empty{text-align:center;padding:40px 20px;color:var(--t2);font-size:13px}
+.search-bar{padding:10px 14px;border-bottom:1px solid var(--b);display:flex;gap:8px}
+.search-bar input{flex:1;padding:8px 12px;border:1px solid var(--b);border-radius:8px;font-size:14px;background:#f8fafc}
+.search-bar select{padding:8px;border:1px solid var(--b);border-radius:8px;font-size:14px;background:#f8fafc}
+.sum-banner{display:flex;justify-content:space-around;padding:8px 14px;background:#f8fafc;border-bottom:1px solid var(--b);font-size:11px;color:var(--t2)}
+.sum-banner b{color:var(--t)}
+.ri{padding:10px 14px;border-bottom:1px solid #f1f5f9;display:flex;align-items:flex-start;gap:8px;cursor:pointer}
+.ri:active{background:#f8fafc}.ri-ic{font-size:18px;flex-shrink:0;margin-top:2px}
+.ri-bd{flex:1;font-size:12px;line-height:1.5}.ri-tl{font-weight:600}.ri-dt{color:var(--t2);font-size:11px}
+.ri-urg{border-left:3px solid var(--r)}.ri-war{border-left:3px solid var(--w)}.ri-inf{border-left:3px solid var(--p)}
+.pull-indicator{text-align:center;padding:8px;color:var(--t2);font-size:11px;display:none}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>🏗️ 废钢管理</h1>
+  <div class="st"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">--</span></div>
+</div>
+
+<div class="pull-indicator" id="pullIndicator">↓ 下拉同步数据</div>
+
+<div class="main" id="mainContent"></div>
+<button class="fab no-print" id="fabBtn" onclick="handleFAB()" style="display:none">+</button>
+
+<div class="sheet" id="sheet">
+  <div class="sheet-bg" onclick="closeSheet()"></div>
+  <div class="sheet-body" id="sheetBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Bottom Tab Bar -->
+<nav style="position:fixed;bottom:0;left:0;right:0;background:var(--c);border-top:1px solid var(--b);display:flex;z-index:100;padding-bottom:var(--btm)">
+  <button class="tb active" data-tab="home" style="flex:1;border:none;background:none;padding:8px 4px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--t2);transition:color .15s">
+    <span style="font-size:20px">📊</span>首页
+  </button>
+  <button class="tb" data-tab="orders" style="flex:1;border:none;background:none;padding:8px 4px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--t2);transition:color .15s">
+    <span style="font-size:20px">📋</span>订单
+  </button>
+  <button class="tb" data-tab="alerts" style="flex:1;border:none;background:none;padding:8px 4px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--t2);transition:color .15s">
+    <span style="font-size:20px">🔔</span>提醒
+  </button>
+  <button class="tb" data-tab="me" style="flex:1;border:none;background:none;padding:8px 4px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--t2);transition:color .15s">
+    <span style="font-size:20px">⚙️</span>我的
+  </button>
+</nav>
+
+<script src="sync.js"></script>
+<script>
+// ==================== DB (same as desktop) ====================
+const DB={
+  _pf:'steel_v5_',
+  _tbls:['orders','vehicles','plants','capital','payers','reminders','settings'],
+  _k(t){return this._pf+t},
+  all(t){try{return JSON.parse(localStorage.getItem(this._k(t))||'[]')}catch{return[]}},
+  get(t,id){return this.all(t).find(r=>r.id===id)},
+  save(t,r){const l=this.all(t);const i=l.findIndex(x=>x.id===r.id);if(i>=0)l[i]=r;else l.unshift(r);localStorage.setItem(this._k(t),JSON.stringify(l));if(typeof Sync!=='undefined')Sync.markPending();return r},
+  del(t,id){const l=this.all(t).filter(r=>r.id!==id);localStorage.setItem(this._k(t),JSON.stringify(l));if(typeof Sync!=='undefined')Sync.markPending()},
+  q(t,fn){return this.all(t).filter(fn)},
+  gid(){return'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,8)},
+  getSetting(key,d){const s=this.all('settings').find(s=>s.key===key);return s?s.value:d},
+  setSetting(key,v){const e=this.all('settings').find(s=>s.key===key);if(e){e.value=v;this.save('settings',e)}else this.save('settings',{id:this.gid(),key,value:v})}
+};
+
+// ==================== UTILS ====================
+function fm(n){if(n==null||isNaN(n))return'¥0';return'¥'+Number(n).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fn(n){if(n==null||isNaN(n))return'0';return Number(n).toLocaleString('zh-CN',{maximumFractionDigits:2})}
+function fd(d){if(!d)return'-';const dt=new Date(d);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')}
+function today(){return new Date().toISOString().split('T')[0]}
+function nowISO(){return new Date().toISOString()}
+function st(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500)}
+const OS={unpaid_unreceived:{l:'未付未回',c:'bad-ur'},paid_unreceived:{l:'已付未回',c:'bad-pr'},received_unpaid:{l:'已回未付',c:'bad-ru'},completed:{l:'已完结',c:'bad-ok'}};
+function sb(s){const o=OS[s]||OS.unpaid_unreceived;return'<span class="bad '+o.c+'">'+o.l+'</span>'}
+function infer(dd,rd){if(dd&&rd)return'completed';if(dd&&!rd)return'paid_unreceived';if(!dd&&rd)return'received_unpaid';return'unpaid_unreceived'}
+
+// ==================== COMPUTE ALERTS (same as desktop) ====================
+function computeAlerts(){
+  const n=today(),r=[],ords=DB.all('orders'),cap=DB.all('capital'),pls=DB.all('plants');
+  function db2(d1,d2){const a=new Date(d1),b=new Date(d2);return Math.ceil((b-a)/(86400000))}
+  function addDays2(d,dy){const nd=new Date(d);nd.setDate(nd.getDate()+dy);return nd.toISOString().split('T')[0]}
+  const up=ords.filter(o=>{const s=o.settle_status||infer(o.settle_driver_date,o.plant_pay_date);return s==='paid_unreceived';});
+  for(const o of up){
+    const p=DB.get('plants',o.plant_id),v=DB.get('vehicles',o.vehicle_id),cy=p?p.settlement_cycle_days:7,sd=o.settle_driver_date||o.order_date;
+    const ex=o.expected_plant_pay_date||addDays2(sd,cy),ov=db2(ex,n);
+    r.push({id:'ap_'+o.id,type:'plant_pay',level:ov>7?'urgent':ov>3?'warn':'info',icon:ov>0?'🔴':'🟡',title:(ov>0?'⚠️ 超期'+ov+'天未回款':'📌 应回款')+' - '+(p?p.name:'?'),detail:'车牌：'+(v?v.plate_number:'?')+' | 金额：'+fm(o.total_amount),link:'orders:'+o.id,ts:nowISO()});
+  }
+  const pp=ords.filter(o=>{const s=o.settle_status||infer(o.settle_driver_date,o.plant_pay_date);return s==='unpaid_unreceived'||s==='received_unpaid';});
+  for(const o of pp){const v=DB.get('vehicles',o.vehicle_id),pr=o.promised_driver_pay_date;if(!pr)continue;const ov=db2(pr,n);if(ov>=-3)r.push({id:'ad_'+o.id,type:'driver_pay',level:ov>0?'urgent':ov>=-2?'warn':'info',icon:ov>0?'🔴':'🟡',title:(ov>0?'🚨 应付司机款超期':'⏰ 应付司机款')+' - '+(v?v.plate_number:'?'),detail:'金额：'+fm(o.total_amount)+' | 承诺：'+fd(pr),link:'orders:'+o.id,ts:nowISO()});}
+  for(const c of cap){if(c.status!=='active'||!c.expected_repay_date)continue;const ov=db2(c.expected_repay_date,n);if(ov>=-7)r.push({id:'al_'+c.id,type:'loan',level:ov>0?'urgent':ov>=-3?'warn':'info',icon:ov>0?'🔴':'🟡',title:(ov>0?'🚨 借款超期':'📅 借款将到期')+' - '+c.source_name,detail:'金额：'+fm(c.amount)+' | 到期：'+fd(c.expected_repay_date),link:'capital:'+c.id,ts:nowISO()});if(c.next_interest_date){const ov2=db2(c.next_interest_date,n);if(ov2>=-5)r.push({id:'ai_'+c.id,type:'interest',level:ov2>0?'urgent':ov2>=-3?'warn':'info',icon:'💸',title:(ov2>0?'⚠️ 利息超期':'付息提醒')+' - '+c.source_name,detail:'到期：'+fd(c.next_interest_date),link:'capital:'+c.id,ts:nowISO()});}}
+  const lu=up.filter(o=>db2(o.settle_driver_date||o.order_date,n)>14);
+  if(lu.length>0)r.push({id:'alu_'+today(),type:'long',level:'urgent',icon:'🔴',title:'🚨 '+lu.length+'笔超14天未回款！',detail:'金额：'+fm(lu.reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0)),link:'orders',ts:nowISO()});
+  return r;
+}
+
+// ==================== SHEET (modal) ====================
+function openSheet(title,body,onSave){document.getElementById('sheetBody').innerHTML='<div class="sh"><h3>'+title+'</h3><button class="sc" onclick="closeSheet()">✕</button></div>'+body+'<div style="margin-top:12px;display:flex;gap:8px"><button class="btn bo" style="flex:1" onclick="closeSheet()">取消</button><button class="btn bp" style="flex:1" id="sheetSave">保存</button></div>';document.getElementById('sheet').classList.add('show');document.getElementById('sheetSave').addEventListener('click',()=>{if(onSave)onSave()})}
+function closeSheet(){document.getElementById('sheet').classList.remove('show')}
+
+// ==================== NAV ====================
+let ct='home';
+document.querySelectorAll('.tb').forEach(b=>{b.addEventListener('click',function(){document.querySelectorAll('.tb').forEach(x=>x.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.tb').forEach(x=>x.style.color=x.classList.contains('active')?'var(--p)':'var(--t2)');ct=this.dataset.tab;render()})});
+
+// ==================== RENDER ====================
+function render(){const m=document.getElementById('mainContent');updateFab();switch(ct){case'home':homeTab(m);break;case'orders':ordersTab(m);break;case'alerts':alertsTab(m);break;case'me':meTab(m);break}}
+function updateFab(){const f=document.getElementById('fabBtn');if(ct==='orders'){f.style.display='flex';f.textContent='+'}else{f.style.display='none'}}
+function handleFAB(){if(ct==='orders')openOrderForm()}
+
+// ==================== TAB: HOME ====================
+function homeTab(m){
+  const n2=today(),ords=DB.all('orders'),td=ords.filter(o=>o.order_date===n2);
+  const tw=td.reduce((s,o)=>s+(parseFloat(o.net_weight)||0),0),ta=td.reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0),tm=td.reduce((s,o)=>s+(parseFloat(o.margin_total||o.commission_total)||0),0);
+  const ua=ords.filter(o=>{const s=o.settle_status||infer(o.settle_driver_date,o.plant_pay_date);return s==='unpaid_unreceived'||s==='received_unpaid';}).reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
+  const ura=ords.filter(o=>{const s=o.settle_status||infer(o.settle_driver_date,o.plant_pay_date);return s==='paid_unreceived';}).reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
+  const recent=ords.sort((a,b)=>b.order_date.localeCompare(a.order_date)||b.created_at.localeCompare(a.created_at)).slice(0,8);
+  m.innerHTML=
+  '<div style="margin-bottom:8px;font-size:12px;color:var(--t2);display:flex;justify-content:space-between"><span>📅 '+fd(n2)+' 今日概览</span><span onclick="doManualSync()" style="color:var(--p);cursor:pointer">🔄 同步</span></div>'+
+  '<div class="dg"><div class="dc"><div class="num">'+td.length+'</div><div class="lbl">接车(台)</div></div><div class="dc"><div class="num">'+fn(tw)+'</div><div class="lbl">总吨数</div></div><div class="dc"><div class="num">'+fm(ta)+'</div><div class="lbl">成交额</div></div><div class="dc"><div class="num s">'+fm(tm)+'</div><div class="lbl">毛利</div></div></div>'+
+  '<div class="dg"><div class="dc" style="background:#fffbeb"><div class="num w">'+fm(ua)+'</div><div class="lbl">待付款</div></div><div class="dc" style="background:#fef2f2"><div class="num d">'+fm(ura)+'</div><div class="lbl">待回款</div></div></div>'+
+  '<div class="card"><div class="ch">📋 最近订单</div>'+(recent.length?recent.map(o=>{const v=DB.get('vehicles',o.vehicle_id),p=DB.get('plants',o.plant_id),s=o.settle_status||infer(o.settle_driver_date,o.plant_pay_date);return'<div class="ol" onclick="viewOrder(\''+o.id+'\')"><div class="ol-l"><div class="t">'+fd(o.order_date)+' · '+(v?v.plate_number:'?')+' · '+(p?p.name:'?')+'</div><div class="s">'+fn(o.net_weight)+'吨 · '+fm(o.total_amount)+'</div></div><div class="ol-r">'+sb(s)+'<div style="font-size:11px;color:var(--g);margin-top:2px">+'+fm(o.margin_total||o.commission_total)+'</div></div></div>'}).join(''):'<div class="empty">今日暂无订单</div>')+'</div>';
+}
+
+// ==================== TAB: ORDERS ====================
+function ordersTab(m){
+  const ords=DB.all('orders').sort((a,b)=>b.order_date.localeCompare(a.order_date)||b.created_at.localeCompare(a.created_at));
+  const vs=DB.all('vehicles'),ps=DB.all('plants');
+  const sw=ords.reduce((s,o)=>s+(parseFloat(o.net_weight)||0),0),sa=ords.reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0),sm=ords.reduce((s,o)=>s+(parseFloat(o.margin_total||o.commission_total)||0),0);
+  m.innerHTML=
+  '<div class="search-bar"><input type="text" id="mo_search" placeholder="🔍 搜索车牌/钢厂..." oninput="ordersTab(document.getElementById(\'mainContent\'))"><select id="mo_status" onchange="ordersTab(document.getElementById(\'mainContent\'))"><option value="">全部状态</option><option value="unpaid_unreceived">未付未回</option><option value="paid_unreceived">已付未回</option><option value="received_unpaid">已回未付</option><option value="completed">已完结</option></select></div>'+
+  '<div class="sum-banner"><span>共 <b>'+ords.length+'</b> 笔</span><span><b>'+fn(sw)+'</b> 吨</span><span><b>'+fm(sa)+'</b> 金额</span><span style="color:var(--g)"><b>'+fm(sm)+'</b> 毛利</span></div>'+
+  '<div id="orderList">'+(ords.length?ords.map(o=>renderOrderCard(o)).join(''):'<div class="empty">暂无订单</div>')+'</div>';
+}
+function renderOrderCard(o){
+  const v=DB.get('vehicles',o.vehicle_id),p=DB.get('plants',o.plant_id),s=o.settle_status||infer(o.settle_driver_date,o.plant_pay_date);
+  return'<div class="ol" onclick="viewOrder(\''+o.id+'\')"><div class="ol-l"><div class="t">'+fd(o.order_date)+' · '+(v?v.plate_number:'?')+' · '+(p?p.name:'?')+'</div><div class="s">'+fn(o.net_weight)+'吨 · '+fm(o.total_amount)+' · '+sb(s)+'</div></div><div class="ol-r"><div class="a" style="color:var(--g)">'+fm(o.margin_total||o.commission_total)+'</div></div></div>';
+}
+function viewOrder(id){
+  const o=DB.get('orders',id);if(!o)return;
+  const v=DB.get('vehicles',o.vehicle_id),p=DB.get('plants',o.plant_id),pp=parseFloat(o.unit_price)||0,dp=pp-(parseFloat(o.margin_per_ton||o.commission_per_ton)||0),s=o.settle_status||infer(o.settle_driver_date,o.plant_pay_date);
+  const body='<div style="font-size:14px;line-height:2.2"><div><b>📅</b> '+fd(o.order_date)+' <b>'+OS[s].l+'</b></div><div><b>🚛</b> '+(v?v.plate_number+' · '+v.driver_name:'?')+'</div><div><b>🏭</b> '+(p?p.name:'?')+' <b>🏷️</b> '+ (o.steel_grade||'-')+'</div><div><b>⚖️</b> '+fn(o.net_weight)+'吨 <b>💵</b> 回款单价 '+fm(pp)+'</div><div style="background:#f8fafc;padding:8px;border-radius:8px;margin:6px 0"><b>打款单价</b> '+fm(dp)+' | <b>打款总价</b> '+fm(o.driver_total_amount)+'<br><b>毛利/吨</b> '+fm(o.margin_per_ton||o.commission_per_ton)+' | <b>毛利合计</b> <span style="color:var(--g);font-size:16px">'+fm(o.margin_total||o.commission_total)+'</span></div><div><b>📤 打款日</b> '+fd(o.settle_driver_date)+' | <b>📥 回款日</b> '+fd(o.plant_pay_date)+'</div><div><b>👤 货主</b> '+(o.owner_name||'-')+'</div><div><b>📝</b> '+(o.notes||'无')+'</div></div>';
+  openSheet('📋 订单详情',body,()=>closeSheet());
+}
+function openOrderForm(o){
+  const ie=!!o,data=o||{},vs=DB.all('vehicles'),ps=DB.all('plants');
+  const vOpts=vs.map(v=>'<option value="'+v.id+'">'+v.plate_number+' · '+v.driver_name+'</option>').join('');
+  const pOpts=ps.map(p=>'<option value="'+p.id+'">'+p.name+'</option>').join('');
+  const dm=DB.getSetting('default_margin','5');
+  const grades=[...new Set(DB.all('orders').map(o=>o.steel_grade).filter(Boolean))];
+  const body=
+  '<div class="fg"><label>📅 日期</label><input type="date" id="mo_date" value="'+(data.order_date||today())+'"></div>'+
+  '<div class="fr"><div class="fg"><label>🚛 车辆</label><select id="mo_vid">'+vOpts+'</select></div><div class="fg"><label>🏭 钢厂</label><select id="mo_pid">'+pOpts+'</select></div></div>'+
+  '<div class="fr"><div class="fg"><label>🏷️ 等级</label><input type="text" id="mo_grade" value="'+(data.steel_grade||'')+'" placeholder="重废A" list="dl_mg"><datalist id="dl_mg">'+grades.map(g=>'<option value="'+g+'">').join('')+'</datalist></div><div class="fg"><label>⚖️ 净重(吨)</label><input type="number" id="mo_w" step="0.01" value="'+(data.net_weight||'')+'" oninput="calcMobile()"></div></div>'+
+  '<div class="fr"><div class="fg"><label>💵 回款单价</label><input type="number" id="mo_up" step="0.01" value="'+(data.unit_price||'')+'" oninput="calcMobile()"></div><div class="fg"><label>📊 毛利(元/吨)</label><input type="number" id="mo_mpt" step="0.01" value="'+(data.margin_per_ton||data.commission_per_ton||dm)+'" oninput="calcMobile()"></div></div>'+
+  '<div style="background:#f8fafc;padding:8px;border-radius:8px;margin-bottom:8px;font-size:13px;text-align:center">💰 回款总价：<b id="calc_ta">--</b> | 💳 打款总价：<b id="calc_dt">--</b> | 🎯 毛利：<b style="color:var(--g)" id="calc_mt">--</b></div>'+
+  '<div class="fr"><div class="fg"><label>📤 打款日期</label><input type="date" id="mo_sd" value="'+(data.settle_driver_date||'')+'"></div><div class="fg"><label>📥 回款日期</label><input type="date" id="mo_ppd" value="'+(data.plant_pay_date||'')+'"></div></div>'+
+  '<div class="fg"><label>📝 备注</label><textarea id="mo_notes">'+(data.notes||'')+'</textarea></div>';
+  openSheet(ie?'编辑订单':'新增订单',body,()=>{
+    const w=parseFloat(document.getElementById('mo_w').value)||0,pp2=parseFloat(document.getElementById('mo_up').value)||0,mt=parseFloat(document.getElementById('mo_mpt').value)||0;
+    const r={id:ie?data.id:DB.gid(),order_date:document.getElementById('mo_date').value,vehicle_id:document.getElementById('mo_vid').value,plant_id:document.getElementById('mo_pid').value,steel_grade:document.getElementById('mo_grade').value,net_weight:w,unit_price:pp2,driver_unit_price:pp2-mt,total_amount:w*pp2,margin_per_ton:mt,margin_total:w*mt,driver_total_amount:w*(pp2-mt),commission_per_ton:mt,commission_total:w*mt,settle_driver_date:document.getElementById('mo_sd').value,plant_pay_date:document.getElementById('mo_ppd').value,settle_status:'',notes:document.getElementById('mo_notes').value||'',owner_name:data.owner_name||'',payer_id:data.payer_id||null,payee_id:data.payee_id||null,created_at:data.created_at||nowISO()};
+    if(!r.vehicle_id||!r.plant_id||!r.net_weight||!r.unit_price){st('请填完整');return}
+    DB.save('orders',r);closeSheet();render();st(ie?'已更新':'已创建');
+  });
+  setTimeout(()=>calcMobile(),100);
+}
+function calcMobile(){const w=parseFloat(document.getElementById('mo_w')?.value)||0,pp2=parseFloat(document.getElementById('mo_up')?.value)||0,mt=parseFloat(document.getElementById('mo_mpt')?.value)||0;const ta=document.getElementById('calc_ta'),dt=document.getElementById('calc_dt'),mtE=document.getElementById('calc_mt');if(ta)ta.textContent=fm(w*pp2);if(dt)dt.textContent=fm(w*(pp2-mt));if(mtE)mtE.textContent=fm(w*mt)}
+
+// ==================== TAB: ALERTS ====================
+function alertsTab(m){
+  const alerts=computeAlerts();
+  m.innerHTML='<div style="margin-bottom:8px;font-size:12px;color:var(--t2)">智能提醒 ('+alerts.length+' 条)</div>'+
+  (alerts.length?alerts.map(a=>'<div class="ri ri-'+(a.level==='urgent'?'urg':a.level==='warn'?'war':'inf')+'" onclick="handleAlertLink(\''+(a.link||'').replace(/'/g,"\\'")+'\')"><div class="ri-ic">'+a.icon+'</div><div class="ri-bd"><div class="ri-tl">'+a.title+'</div><div class="ri-dt">'+a.detail+'</div></div></div>').join(''):'<div class="empty"><div style="font-size:40px">✅</div>暂无提醒</div>');
+}
+function handleAlertLink(link){if(!link)return;if(link.startsWith('orders:')){ct='orders';render();const id=link.split(':')[1];if(id)setTimeout(()=>viewOrder(id),300)}else if(link==='orders'){ct='orders';render()}else{st('请切换到对应页面查看')}}
+
+// ==================== TAB: ME ====================
+function meTab(m){
+  const s=typeof Sync!=='undefined'?Sync.getStatus():{hasToken:false,lastPull:null,inSync:true};
+  const stats={orders:DB.all('orders').length,vehicles:DB.all('vehicles').length,plants:DB.all('plants').length};
+  const tk=typeof Sync!=='undefined'?Sync.getToken():'';
+  m.innerHTML=
+  '<div class="ss" style="margin-bottom:10px"><h4 style="font-size:13px;font-weight:700;margin-bottom:8px">🔄 数据同步</h4>'+
+  '<div style="font-size:12px;line-height:2"><div>状态：'+(s.hasToken?(s.inSync?'<span style="color:var(--g)">✅ 已同步</span>':'<span style="color:var(--w)">🟡 有未同步数据</span>'):'<span style="color:var(--r)">⚠️ 未配置</span>')+'</div>'+
+  '<div>上次拉取：'+(s.lastPull?new Date(s.lastPull).toLocaleString('zh-CN'):'从未')+'</div></div>'+
+  '<div class="fg" style="margin-top:8px"><label>GitHub Token</label><input type="password" id="ms_token" value="'+tk+'" placeholder="ghp_xxxx" style="font-size:14px"></div>'+
+  '<div style="display:flex;gap:6px;margin-top:8px"><button class="btn bp bs" style="flex:1" onclick="saveMobileToken()">💾 保存Token</button><button class="btn bo bs" style="flex:1" onclick="doManualSync()">🔄 立即同步</button></div>'+
+  '<span style="font-size:10px;color:var(--t2)">Token仅存本地，只用于同步数据</span></div>'+
+  '<div class="card"><div class="ch">⚙️ 设置</div><div class="cb" style="font-size:13px;line-height:2.2">'+
+  '<div>👤 '+DB.getSetting('user_name','未设置')+' | 🏢 '+DB.getSetting('company_name','')+'</div>'+
+  '<div>📊 默认毛利：'+DB.getSetting('default_margin','5')+'元/吨</div>'+
+  '<div>📋 '+stats.orders+'笔订单 | 🚛 '+stats.vehicles+'台车 | 🏭 '+stats.plants+'家钢厂</div></div></div>'+
+  '<div class="card"><div class="ch">📦 数据管理</div><div class="cb" style="display:flex;gap:6px;flex-wrap:wrap">'+
+  '<button class="btn bp bs" onclick="mExport()">📥 导出</button>'+
+  '<button class="btn bo bs" onclick="document.getElementById(\'m_imf\').click()">📤 导入</button>'+
+  '<button class="btn bd bs" onclick="mClearAll()">🗑️ 清除</button>'+
+  '<input type="file" id="m_imf" accept=".json" style="display:none" onchange="mImport(this)"></div></div>'+
+  '<div style="text-align:center;padding:16px;font-size:11px;color:var(--t2)">废钢管理系统 v5.1 · 手机版<br>零成本 · 数据同步 · 随时随地</div>';
+}
+
+// ==================== MOBILE SYNC ====================
+function saveMobileToken(){
+  const v=document.getElementById('ms_token').value.trim();
+  if(typeof Sync!=='undefined'){Sync.setToken(v);localStorage.setItem('steel_v5_sync_token_v2',v)}
+  st('Token已保存');render();
+}
+async function doManualSync(){
+  if(typeof Sync==='undefined'){st('同步模块未加载');return}
+  st('同步中...');
+  const r=await Sync.pull();
+  if(r.updated){st('已拉取 '+r.count+' 条');render()}else{st(r.error||'远程无新数据')}
+  if(Sync.hasToken()){const pr=await Sync.push();if(pr.ok)st('同步完成');else if(pr.error)st(pr.error)}
+  updateSyncIndicator();
+}
+function updateSyncIndicator(){
+  const dot=document.getElementById('syncDot'),label=document.getElementById('syncLabel');
+  if(!dot||!label)return;
+  if(typeof Sync==='undefined'){dot.className='sync-dot err';label.textContent='未加载';return}
+  const s=Sync.getStatus();
+  if(!s.hasToken){dot.className='sync-dot err';label.textContent='未配置Token'}else if(s.inSync){dot.className='sync-dot ok';label.textContent='已同步'}else{dot.className='sync-dot pending';label.textContent='待同步'}
+}
+
+// ==================== DATA MANAGEMENT ====================
+function mExport(){const d={};DB._tbls.forEach(t=>{d[t]=DB.all(t)});const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='废钢管理备份_'+today()+'.json';a.click();st('已导出')}
+function mImport(inp){const f=inp.files[0];if(!f)return;if(!confirm('导入将覆盖现有数据，确定？')){inp.value='';return}const rd=new FileReader();rd.onload=function(e){try{const d=JSON.parse(e.target.result);let c=0;DB._tbls.forEach(t=>{if(d[t]){localStorage.setItem(DB._k(t),JSON.stringify(d[t]));c+=d[t].length}});render();st('导入'+c+'条✅')}catch{st('格式错误')}};rd.readAsText(f);inp.value=''}
+function mClearAll(){if(!confirm('⚠️ 确定清除全部数据？请先确保已导出备份！'))return;DB._tbls.forEach(t=>localStorage.removeItem(DB._k(t)));render();st('已清除')}
+
+// ==================== PULL TO REFRESH ====================
+let pullStart=0,pullActive=false;
+document.addEventListener('touchstart',e=>{if(window.scrollY===0)pullStart=e.touches[0].clientY},true);
+document.addEventListener('touchmove',e=>{if(pullStart&&window.scrollY===0){const dy=e.touches[0].clientY-pullStart;if(dy>60&&!pullActive){pullActive=true;document.getElementById('pullIndicator').style.display='block';document.getElementById('pullIndicator').textContent='↓ 松手同步'}}},true);
+document.addEventListener('touchend',async()=>{if(pullActive){document.getElementById('pullIndicator').textContent='同步中...';await doManualSync();document.getElementById('pullIndicator').style.display='none';pullActive=false}pullStart=0},true);
+
+// ==================== INIT ====================
+async function init(){
+  // 迁移 token
+  const tk2=localStorage.getItem('steel_v5_sync_token_v2');
+  if(tk2&&typeof Sync!=='undefined'&&!Sync.hasToken()){Sync.setToken(tk2)}
+  // 初始化同步
+  if(typeof Sync!=='undefined'){await Sync.init();setInterval(()=>updateSyncIndicator(),30000)}
+  updateSyncIndicator();
+  render();
+}
+init();
+</script>
+</body>
+</html>

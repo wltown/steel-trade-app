@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-title" content="废钢管理">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%230f172a'/%3E%3Ctext x='96' y='110' text-anchor='middle' fill='white' font-size='72'%3E🏗️%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/png;base64,AAAADUlIRFIAAADAAAAAwAgGAAAAUtxsBwAAAhhJREFUeJzt0yEBACAQwMBvgKQD/ftBDMROnJ/ZrH0uVM3vAPjJAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIex1DewWZhIE+AAAAAElFTkSuQmCC">
 <title>废钢管理 · 手机版</title>
 <style>
 :root{--p:#2563eb;--pd:#1d4ed8;--r:#dc2626;--g:#16a34a;--w:#ea580c;--bg:#f1f5f9;--c:#fff;--t:#0f172a;--t2:#64748b;--b:#e2e8f0;--rd:12px;--sh:0 1px 3px rgba(0,0,0,.06);--btm:env(safe-area-inset-bottom,0px)}
@@ -240,6 +240,10 @@ function meTab(m){
   '<div>👤 '+DB.getSetting('user_name','未设置')+' | 🏢 '+DB.getSetting('company_name','')+'</div>'+
   '<div>📊 默认毛利：'+DB.getSetting('default_margin','5')+'元/吨</div>'+
   '<div>📋 '+stats.orders+'笔订单 | 🚛 '+stats.vehicles+'台车 | 🏭 '+stats.plants+'家钢厂</div></div></div>'+
+  '<div class="card" id="installCard"><div class="ch">📱 添加到桌面</div><div class="cb" style="text-align:center">'+
+  '<p style="font-size:12px;color:var(--t2);margin-bottom:10px">像 App 一样使用，桌面图标一键打开</p>'+
+  '<button class="btn bp" style="width:100%;font-size:15px" id="btnInstall" onclick="installApp()">📲 安装到桌面</button>'+
+  '<p style="font-size:10px;color:var(--t2);margin-top:8px;display:none" id="installTip">如按钮无效：浏览器菜单 → 添加到主屏幕</p></div></div>'+
   '<div class="card"><div class="ch">📦 数据管理</div><div class="cb" style="display:flex;gap:6px;flex-wrap:wrap">'+
   '<button class="btn bp bs" onclick="mExport()">📥 导出</button>'+
   '<button class="btn bo bs" onclick="document.getElementById(\'m_imf\').click()">📤 导入</button>'+
@@ -290,22 +294,46 @@ async function init(){
   if(typeof Sync!=='undefined'){await Sync.init();setInterval(()=>updateSyncIndicator(),30000)}
   updateSyncIndicator();
   render();
-  // PWA: 注册 Service Worker
+  // PWA: Service Worker
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
-  // PWA: 安装提示（延迟显示，等用户用一会儿）
-  setTimeout(checkInstallPrompt,5000);
+  // PWA: 检查是否已安装
+  if(window.matchMedia('(display-mode: standalone)').matches){localStorage.setItem('pwa_installed','1');document.getElementById('installCard')&&(document.getElementById('installCard').style.display='none')}
+  // 更新安装按钮状态
+  setTimeout(updateInstallBtn,2000);
 }
-// PWA 安装提示
+
+// ==================== PWA 安装 ====================
 let deferredPrompt=null;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e});
-function checkInstallPrompt(){
-  if(deferredPrompt&&!localStorage.getItem('pwa_installed')){
-    const banner=document.createElement('div');
-    banner.style.cssText='position:fixed;top:0;left:0;right:0;background:#2563eb;color:#fff;padding:12px 16px;z-index:999;display:flex;align-items:center;gap:10px;font-size:13px;animation:su .3s ease';
-    banner.innerHTML='<span style="flex:1">📱 点击添加到手机桌面，像App一样使用</span><button style="background:rgba(255,255,255,.2);color:#fff;border:none;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600;cursor:pointer" id="pwaInstall">安装</button><button style="background:none;color:#fff;border:none;font-size:18px;cursor:pointer;padding:2px 6px" id="pwaClose">✕</button>';
-    document.body.prepend(banner);
-    document.getElementById('pwaInstall').onclick=()=>{deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{localStorage.setItem('pwa_installed','1');banner.remove()})};
-    document.getElementById('pwaClose').onclick=()=>{banner.remove()};
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();
+  deferredPrompt=e;
+  updateInstallBtn();
+});
+function updateInstallBtn(){
+  const btn=document.getElementById('btnInstall');
+  if(!btn)return;
+  if(localStorage.getItem('pwa_installed')){
+    btn.textContent='✅ 已安装';btn.style.opacity='.6';btn.onclick=null;
+    return;
+  }
+  if(deferredPrompt){
+    btn.textContent='📲 安装到桌面';
+    btn.style.opacity='1';
+  }else{
+    btn.textContent='📲 安装到桌面';
+    document.getElementById('installTip')&&(document.getElementById('installTip').style.display='block');
+  }
+}
+function installApp(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(r){
+      if(r.outcome==='accepted'){localStorage.setItem('pwa_installed','1');document.getElementById('installCard')&&(document.getElementById('installCard').style.display='none');st('安装成功！')}
+      deferredPrompt=null;
+    });
+  }else{
+    // 备用：提示用户手动操作
+    alert('请点击浏览器右上角 ⋮ → 添加到主屏幕\n\n(iPhone: 底部分享 → 添加到主屏幕)');
   }
 }
 init();

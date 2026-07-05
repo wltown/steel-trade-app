@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-title" content="废钢管理">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/png;base64,AAAADUlIRFIAAADAAAAAwAgGAAAAUtxsBwAAAhhJREFUeJzt0yEBACAQwMBvgKQD/ftBDMROnJ/ZrH0uVM3vAPjJAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIex1DewWZhIE+AAAAAElFTkSuQmCC">
+<link rel="apple-touch-icon" href="icon-192.png"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <title>废钢管理 · 手机版</title>
 <style>
 :root{--p:#2563eb;--pd:#1d4ed8;--r:#dc2626;--g:#16a34a;--w:#ea580c;--bg:#f1f5f9;--c:#fff;--t:#0f172a;--t2:#64748b;--b:#e2e8f0;--rd:12px;--sh:0 1px 3px rgba(0,0,0,.06);--btm:env(safe-area-inset-bottom,0px)}
@@ -295,7 +295,7 @@ async function init(){
   updateSyncIndicator();
   render();
   // PWA: Service Worker
-  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js',{scope:'/steel-trade-app/'}).catch(()=>{})}
   // PWA: 检查是否已安装
   if(window.matchMedia('(display-mode: standalone)').matches){localStorage.setItem('pwa_installed','1');document.getElementById('installCard')&&(document.getElementById('installCard').style.display='none')}
   // 更新安装按钮状态

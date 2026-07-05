@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>废钢管理 · 手机入口</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(135deg,#0f172a,#1e3a5f);min-height:100vh;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center}
+.box{background:rgba(255,255,255,.08);border-radius:20px;padding:40px 30px;max-width:380px;width:94%;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1)}
+h1{font-size:22px;margin-bottom:6px}.sub{font-size:13px;opacity:.6;margin-bottom:24px}
+.qr{background:#fff;border-radius:16px;padding:16px;display:inline-block;margin-bottom:20px}
+.qr img,.qr canvas{width:200px;height:200px;display:block}
+.tips{font-size:12px;opacity:.5;margin-top:6px}
+.btn{display:inline-block;padding:10px 28px;background:rgba(255,255,255,.15);border-radius:24px;color:#fff;text-decoration:none;font-size:14px;margin-top:12px;border:1px solid rgba(255,255,255,.2)}
+.btn:hover{background:rgba(255,255,255,.25)}
+.url{font-size:14px;opacity:.9;word-break:break-all;margin:16px 0;padding:8px 16px;background:rgba(0,0,0,.2);border-radius:8px}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🏗️ 废钢管理系统</h1>
+  <div class="sub">手机扫码 · 随时随地管业务</div>
+  <div class="qr" id="qr"></div>
+  <div class="tips">📷 用手机相机扫一扫即可打开</div>
+  <div class="url" onclick="copyUrl()" style="cursor:pointer">🔗 点击复制链接</div>
+  <a class="btn" href="mobile.html">📱 直接打开手机版</a>
+</div>
+<script>
+(function() {
+  var url = 'https://wltown.github.io/steel-trade-app/mobile.html';
+  var size = 200;
+  var qr = document.getElementById('qr');
+  var canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, size, size);
+
+  // Simple QR-like pattern (fallback: if QR library not available, show URL text)
+  // We encode using Google Charts API as a reliable QR source
+  var img = document.createElement('img');
+  img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(url);
+  img.width = size;
+  img.height = size;
+  img.style.display = 'block';
+  img.onerror = function() {
+    // Fallback: show URL as text
+    qr.innerHTML = '<div style="width:200px;height:200px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#333;word-break:break-all;padding:10px">'+url+'</div>';
+  };
+  qr.appendChild(img);
+
+  // Copy URL
+  window.copyUrl = function() {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(function() {
+        alert('链接已复制！发到微信即可打开');
+      });
+    } else {
+      prompt('复制以下链接：', url);
+    }
+  };
+})();
+</script>
+</body>
+</html>

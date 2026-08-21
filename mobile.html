@@ -194,21 +194,30 @@ function viewOrder(id){
 }
 function openOrderForm(o){
   const ie=!!o,data=o||{},vs=DB.all('vehicles'),ps=DB.all('plants');
-  const vOpts=vs.map(v=>'<option value="'+v.id+'">'+v.plate_number+' · '+v.driver_name+'</option>').join('');
-  const pOpts=ps.map(p=>'<option value="'+p.id+'">'+p.name+'</option>').join('');
+  const vOpts=vs.map(v=>'<option value="'+v.plate_number+'">'+(v.driver_name?v.plate_number+' · '+v.driver_name:v.plate_number)+'</option>').join('');
+  const pOpts=ps.map(p=>'<option value="'+p.name+'">'+p.name+'</option>').join('');
   const dm=DB.getSetting('default_margin','5');
   const grades=[...new Set(DB.all('orders').map(o=>o.steel_grade).filter(Boolean))];
+  const curV=vs.find(x=>x.id===data.vehicle_id),curP=ps.find(x=>x.id===data.plant_id);
   const body=
   '<div class="fg"><label>📅 日期</label><input type="date" id="mo_date" value="'+(data.order_date||today())+'"></div>'+
-  '<div class="fr"><div class="fg"><label>🚛 车辆</label><select id="mo_vid">'+vOpts+'</select></div><div class="fg"><label>🏭 钢厂</label><select id="mo_pid">'+pOpts+'</select></div></div>'+
+  '<div class="fr"><div class="fg"><label>🚛 车辆</label><input list="dl_mv" id="mo_vid_txt" value="'+(curV?(curV.plate_number+' '+(curV.driver_name||'')).trim():'')+'" placeholder="输入或选择车牌" autocomplete="off"><datalist id="dl_mv">'+vOpts+'</datalist><input type="hidden" id="mo_vid" value="'+(data.vehicle_id||'')+'"></div><div class="fg"><label>🏭 钢厂</label><input list="dl_mp" id="mo_pid_txt" value="'+(curP?curP.name:'')+'" placeholder="输入或选择钢厂" autocomplete="off"><datalist id="dl_mp">'+pOpts+'</datalist><input type="hidden" id="mo_pid" value="'+(data.plant_id||'')+'"></div></div>'+
   '<div class="fr"><div class="fg"><label>🏷️ 等级</label><input type="text" id="mo_grade" value="'+(data.steel_grade||'')+'" placeholder="重废A" list="dl_mg"><datalist id="dl_mg">'+grades.map(g=>'<option value="'+g+'">').join('')+'</datalist></div><div class="fg"><label>⚖️ 净重(吨)</label><input type="number" id="mo_w" step="0.01" value="'+(data.net_weight||'')+'" oninput="calcMobile()"></div></div>'+
   '<div class="fr"><div class="fg"><label>💵 回款单价</label><input type="number" id="mo_up" step="0.01" value="'+(data.unit_price||'')+'" oninput="calcMobile()"></div><div class="fg"><label>📊 毛利(元/吨)</label><input type="number" id="mo_mpt" step="0.01" value="'+(data.margin_per_ton||data.commission_per_ton||dm)+'" oninput="calcMobile()"></div></div>'+
   '<div style="background:#f8fafc;padding:8px;border-radius:8px;margin-bottom:8px;font-size:13px;text-align:center">💰 回款总价：<b id="calc_ta">--</b> | 💳 打款总价：<b id="calc_dt">--</b> | 🎯 毛利：<b style="color:var(--g)" id="calc_mt">--</b></div>'+
   '<div class="fr"><div class="fg"><label>📤 打款日期</label><input type="date" id="mo_sd" value="'+(data.settle_driver_date||'')+'"></div><div class="fg"><label>📥 回款日期</label><input type="date" id="mo_ppd" value="'+(data.plant_pay_date||'')+'"></div></div>'+
   '<div class="fg"><label>📝 备注</label><textarea id="mo_notes">'+(data.notes||'')+'</textarea></div>';
   openSheet(ie?'编辑订单':'新增订单',body,()=>{
+    const vidTxt=document.getElementById('mo_vid_txt').value.trim();
+    const vid=vidTxt?vs.find(v=>v.plate_number===vidTxt||(v.plate_number+' '+(v.driver_name||'')).includes(vidTxt)):undefined;
+    let vehicle_id=vid?vid.id:(data.vehicle_id||'');
+    if(!vehicle_id&&vidTxt)vehicle_id=DB.save('vehicles',{id:DB.gid(),plate_number:vidTxt,driver_name:'',created_at:nowISO()}).id;
+    const pidTxt=document.getElementById('mo_pid_txt').value.trim();
+    const pid=pidTxt?ps.find(p=>p.name===pidTxt||p.name.includes(pidTxt)):undefined;
+    let plant_id=pid?pid.id:(data.plant_id||'');
+    if(!plant_id&&pidTxt)plant_id=DB.save('plants',{id:DB.gid(),name:pidTxt,created_at:nowISO()}).id;
     const w=parseFloat(document.getElementById('mo_w').value)||0,pp2=parseFloat(document.getElementById('mo_up').value)||0,mt=parseFloat(document.getElementById('mo_mpt').value)||0;
-    const r={id:ie?data.id:DB.gid(),order_date:document.getElementById('mo_date').value,vehicle_id:document.getElementById('mo_vid').value,plant_id:document.getElementById('mo_pid').value,steel_grade:document.getElementById('mo_grade').value,net_weight:w,unit_price:pp2,driver_unit_price:pp2-mt,total_amount:w*pp2,margin_per_ton:mt,margin_total:w*mt,driver_total_amount:w*(pp2-mt),commission_per_ton:mt,commission_total:w*mt,settle_driver_date:document.getElementById('mo_sd').value,plant_pay_date:document.getElementById('mo_ppd').value,settle_status:'',notes:document.getElementById('mo_notes').value||'',owner_name:data.owner_name||'',payer_id:data.payer_id||null,payee_id:data.payee_id||null,created_at:data.created_at||nowISO()};
+    const r={id:ie?data.id:DB.gid(),order_date:document.getElementById('mo_date').value,vehicle_id,plant_id,steel_grade:document.getElementById('mo_grade').value,net_weight:w,unit_price:pp2,driver_unit_price:pp2-mt,total_amount:w*pp2,margin_per_ton:mt,margin_total:w*mt,driver_total_amount:w*(pp2-mt),commission_per_ton:mt,commission_total:w*mt,settle_driver_date:document.getElementById('mo_sd').value,plant_pay_date:document.getElementById('mo_ppd').value,settle_status:'',notes:document.getElementById('mo_notes').value||'',owner_name:data.owner_name||'',payer_id:data.payer_id||null,payee_id:data.payee_id||null,created_at:data.created_at||nowISO()};
     if(!r.vehicle_id||!r.plant_id||!r.net_weight||!r.unit_price){st('请填完整');return}
     DB.save('orders',r);closeSheet();render();st(ie?'已更新':'已创建');
   });

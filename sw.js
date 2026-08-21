@@ -1,6 +1,6 @@
 // Service Worker for 废钢管理系统
 // Minimal SW to enable PWA install on Chrome Android
-var CACHE = 'steel-v3';
+var CACHE = 'steel-v4';
 var URLS = [
   '/steel-trade-app/mobile.html',
   '/steel-trade-app/sync.js',
